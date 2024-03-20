@@ -1,34 +1,36 @@
 import _thread
+import asyncio
 import binascii
 import gzip
 import json
 import os
-import signal
-import sys
-
-from config import LIVE_GIFT_LIST
-from src.utils.logger import logger
 import re
+import signal
 import time
+
 import requests
 import websocket
-from src.utils.ws_send import ws_send, ws_sender
-from src import live_rank
-from src.utils.common import GlobalVal
-from protobuf_inspector.types import StandardParser
 from google.protobuf import json_format
+from protobuf_inspector.types import StandardParser
+
+from config import LIVE_GIFT_LIST
+from local_server import broadcast
+from proto.dy_pb2 import ChatMessage
+from proto.dy_pb2 import CommonTextMessage
+from proto.dy_pb2 import GiftMessage
+from proto.dy_pb2 import LikeMessage
+from proto.dy_pb2 import MatchAgainstScoreMessage
+from proto.dy_pb2 import MemberMessage
+from proto.dy_pb2 import ProductChangeMessage
 from proto.dy_pb2 import PushFrame
 from proto.dy_pb2 import Response
-from proto.dy_pb2 import MatchAgainstScoreMessage
-from proto.dy_pb2 import LikeMessage
-from proto.dy_pb2 import MemberMessage
-from proto.dy_pb2 import GiftMessage
-from proto.dy_pb2 import ChatMessage
-from proto.dy_pb2 import SocialMessage
 from proto.dy_pb2 import RoomUserSeqMessage
+from proto.dy_pb2 import SocialMessage
 from proto.dy_pb2 import UpdateFanTicketMessage
-from proto.dy_pb2 import CommonTextMessage
-from proto.dy_pb2 import ProductChangeMessage
+from src import live_rank
+from src.utils.common import GlobalVal
+from src.utils.logger import logger
+from src.utils.ws_send import ws_sender
 
 # 直播信息全局变量
 liveRoomId = ""
@@ -56,52 +58,62 @@ def onMessage(ws: websocket.WebSocketApp, message: bytes):
     for msg in payloadPackage.messagesList:
         # 反对分数消息
         if msg.method == 'WebcastMatchAgainstScoreMessage':
-            unPackMatchAgainstScoreMessage(msg.payload)
+            data = unPackMatchAgainstScoreMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
 
         # 点赞数
         if msg.method == 'WebcastLikeMessage':
-            unPackWebcastLikeMessage(msg.payload)
+            data = unPackWebcastLikeMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
 
         # 成员进入直播间消息
         if msg.method == 'WebcastMemberMessage':
-            unPackWebcastMemberMessage(msg.payload)
+            data = unPackWebcastMemberMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
 
         # 礼物消息
         if msg.method == 'WebcastGiftMessage':
-            unPackWebcastGiftMessage(msg.payload)
+            data = unPackWebcastGiftMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
 
         # 聊天消息
         if msg.method == 'WebcastChatMessage':
-            unPackWebcastChatMessage(msg.payload)
+            data = unPackWebcastChatMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
 
         # 联谊会消息
         if msg.method == 'WebcastSocialMessage':
-            unPackWebcastSocialMessage(msg.payload)
+            data = unPackWebcastSocialMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
 
         # 房间用户发送消息
         if msg.method == 'WebcastRoomUserSeqMessage':
-            unPackWebcastRoomUserSeqMessage(msg.payload)
+            data = unPackWebcastRoomUserSeqMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
 
         # 更新粉丝票
         if msg.method == 'WebcastUpdateFanTicketMessage':
-            unPackWebcastUpdateFanTicketMessage(msg.payload)
+            data = unPackWebcastUpdateFanTicketMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
 
         # 公共文本消息
         if msg.method == 'WebcastCommonTextMessage':
-            unPackWebcastCommonTextMessage(msg.payload)
+            data = unPackWebcastCommonTextMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
 
         # 商品改变消息
         if msg.method == 'WebcastProductChangeMessage':
-            WebcastProductChangeMessage(msg.payload)
+            data = WebcastProductChangeMessage(msg.payload)
+            asyncio.run(broadcast(data))
             continue
         logger.info('[onMessage] [待解析方法' + msg.method + '等待解析～] [房间Id：' + liveRoomId + ']')
 
@@ -273,7 +285,8 @@ def ping(ws):
 def wssServerStart():
     websocket.enableTrace(False)
     # 拼接获取弹幕消息的websocket的链接
-    webSocketUrl = 'wss://webcast3-ws-web-lq.douyin.com/webcast/im/push/v2/?app_name=douyin_web&version_code=180800&webcast_sdk_version=1.3.0&update_version_code=1.3.0&compress=gzip&internal_ext=internal_src:dim|wss_push_room_id:' + liveRoomId + '|wss_push_did:7188358506633528844|dim_log_id:20230521093022204E5B327EF20D5CDFC6|fetch_time:1684632622323|seq:1|wss_info:0-1684632622323-0-0|wrds_kvs:WebcastRoomRankMessage-1684632106402346965_WebcastRoomStatsMessage-1684632616357153318&cursor=t-1684632622323_r-1_d-1_u-1_h-1&host=https://live.douyin.com&aid=6383&live_id=1&did_rule=3&debug=false&maxCacheMessageNumber=20&endpoint=live_pc&support_wrds=1&im_path=/webcast/im/fetch/&user_unique_id=7188358506633528844&device_platform=web&cookie_enabled=true&screen_width=1440&screen_height=900&browser_language=zh&browser_platform=MacIntel&browser_name=Mozilla&browser_version=5.0%20(Macintosh;%20Intel%20Mac%20OS%20X%2010_15_7)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/113.0.0.0%20Safari/537.36&browser_online=true&tz_name=Asia/Shanghai&identity=audience&room_id=' + liveRoomId + '&heartbeatDuration=0&signature=00000000'
+    webSocketUrl = (
+        f'wss://webcast3-ws-web-lq.douyin.com/webcast/im/push/v2/?app_name=douyin_web&version_code=180800&webcast_sdk_version=1.3.0&update_version_code=1.3.0&compress=gzip&internal_ext=internal_src:dim|wss_push_room_id:{liveRoomId}|wss_push_did:7188358506633528844|dim_log_id:20230521093022204E5B327EF20D5CDFC6|fetch_time:1684632622323|seq:1|wss_info:0-1684632622323-0-0|wrds_kvs:WebcastRoomRankMessage-1684632106402346965_WebcastRoomStatsMessage-1684632616357153318&cursor=t-1684632622323_r-1_d-1_u-1_h-1&host=https://live.douyin.com&aid=6383&live_id=1&did_rule=3&debug=false&maxCacheMessageNumber=20&endpoint=live_pc&support_wrds=1&im_path=/webcast/im/fetch/&user_unique_id=7188358506633528844&device_platform=web&cookie_enabled=true&screen_width=1440&screen_height=900&browser_language=zh&browser_platform=MacIntel&browser_name=Mozilla&browser_version=5.0%20(Macintosh;%20Intel%20Mac%20OS%20X%2010_15_7)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/113.0.0.0%20Safari/537.36&browser_online=true&tz_name=Asia/Shanghai&identity=audience&room_id={liveRoomId}&heartbeatDuration=0&signature=00000000')
     h = {
         'cookie': 'ttwid=' + ttwid,
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
@@ -342,7 +355,7 @@ def parseLiveRoomUrl(url):
     logger.info(f"直播流FLV地址是: {res_stream_flv}")
     print(f"直播流FLV地址是: {res_stream_flv}")
     # 开始获取直播间排行
-    live_rank.interval_rank(liveRoomId)
+    # live_rank.interval_rank(liveRoomId)
     # 创建websocket客户端，并开始监听消息
     wssServerStart()
 

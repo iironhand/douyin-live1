@@ -10,7 +10,8 @@ file_fmt = "%(asctime)s - %(levelname)s - %(message)s"
 # 配置日志文件保存
 if LOG_FILE_SAVE:
     file_path = os.path.join(os.getcwd(), LOG_FILE_NAME)
-    logging.basicConfig(level=LOG_LEVEL, format=file_fmt, filename=file_path, filemode="a", encoding="utf-8")
+    # logging.basicConfig(level=LOG_LEVEL, format=file_fmt, filename=file_path, filemode="a", encoding="utf-8")
+    logging.basicConfig(level=LOG_LEVEL, format=file_fmt, encoding="utf-8")
 # else:
 #     logging.basicConfig(level=LOG_LEVEL, format=file_fmt)
 console_handler = logging.StreamHandler()

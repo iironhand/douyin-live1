@@ -36,8 +36,6 @@ def get_rank(room_id):
     # 判断是否存在排名，不存在就是空
     GlobalVal.rank_user = ranks_three
     logger.info(f"更新打赏排行: {ranks_three}")
-    print(f"更新打赏排行: {ranks_three}")
-
 
 def handle_rank(roo_id, delay):
     while True:
@@ -49,12 +47,9 @@ def handle_rank(roo_id, delay):
 
 
 def interval_rank(roo_id):
-    print(f"间隔{LIVE_RANK_INTERVAL}秒更新一下排行")
     if LIVE_RANK_LIST:
         rank_t = threading.Thread(target=handle_rank, args=(roo_id, LIVE_RANK_INTERVAL))
         rank_t.start()
-    else:
-        print(f"未开启直播礼物排名")
 
 
 if __name__ == '__main__':
