@@ -19,8 +19,8 @@ async def handle_client(websocket, path):
 
 # 启动WebSocket服务器
 async def start_server():
-    async with websockets.serve(handle_client, "localhost", 8888):
-        print("WebSocket server is listening on localhost:8888")
+    async with websockets.serve(handle_client, "127.0.0.1", 8888):
+        print("WebSocket server is listening on :8888")
         await asyncio.Future()  # 阻塞，保持服务器运行
 
 
