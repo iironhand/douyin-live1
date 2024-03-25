@@ -28,6 +28,7 @@ class MyServerProtocol(WebSocketServerProtocol):
     def onClose(self, wasClean, code, reason):
         print("WebSocket connection closed: {}".format(reason))
         self.is_connected = False
+        clients.remove(self)
 
 
 # 启动WebSocket服务器
