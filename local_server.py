@@ -1,5 +1,4 @@
 import asyncio
-import json
 
 import websockets
 
@@ -33,7 +32,7 @@ async def broadcast(message):
 
     for conn in conns:
         try:
-            await conn.send(json.dumps(message, ensure_ascii=True))
+            await conn.send(message)
             await asyncio.sleep(0)
 
         except websockets.exceptions.ConnectionClosed as e:

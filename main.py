@@ -8,7 +8,7 @@ from src import dy_live
 from src.utils.common import init_global
 from src.utils.http_send import send_start
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _thread.start_new_thread(asyncio.run, (start_server(),))
 
     args = sys.argv
