@@ -1,1 +1,1 @@
-pyinstaller -F .\main.py
+pyinstaller -F .\main.py -n barrage
