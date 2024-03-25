@@ -1,8 +1,10 @@
 import asyncio
+from asyncio.log import logger
 
 import websockets
 
 conns = set()
+message_queue = asyncio.Queue()
 
 
 # 定义处理WebSocket连接的回调函数
@@ -24,18 +26,9 @@ async def start_server():
 
 
 # 广播
-async def broadcast(message):
+async def broadcast1(message):
     if len(conns) == 0:
         return
-
-    err_conn_set = set()
-
+    # await print("broadcast message:", message)
     for conn in conns:
-        try:
-            await conn.send(message)
-            await asyncio.sleep(0)
-
-        except websockets.exceptions.ConnectionClosed as e:
-            err_conn_set.add(conn)
-    # 删除无效的链接
-    conns.difference_update(err_conn_set)
+        await conn.send(message)

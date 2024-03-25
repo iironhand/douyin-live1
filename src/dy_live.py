@@ -14,15 +14,24 @@ from google.protobuf import json_format
 from protobuf_inspector.types import StandardParser
 
 from config import LIVE_GIFT_LIST
-from local_server import broadcast
-from proto.dy_pb2 import (ChatMessage, CommonTextMessage, GiftMessage,
-                          LikeMessage, MatchAgainstScoreMessage, MemberMessage,
-                          ProductChangeMessage, PushFrame, Response,
-                          RoomUserSeqMessage, SocialMessage,
-                          UpdateFanTicketMessage)
+from proto.dy_pb2 import (
+    ChatMessage,
+    CommonTextMessage,
+    GiftMessage,
+    LikeMessage,
+    MatchAgainstScoreMessage,
+    MemberMessage,
+    ProductChangeMessage,
+    PushFrame,
+    Response,
+    RoomUserSeqMessage,
+    SocialMessage,
+    UpdateFanTicketMessage,
+)
 from src.utils.common import GlobalVal
 from src.utils.logger import logger
 from src.utils.ws_send import ws_sender
+from src.ws_server import broadcast
 
 # 直播信息全局变量
 liveRoomId = ""
@@ -51,61 +60,64 @@ def onMessage(ws: websocket.WebSocketApp, message: bytes):
         # 反对分数消息
         if msg.method == "WebcastMatchAgainstScoreMessage":
             data = unPackMatchAgainstScoreMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            broadcast(data)
             continue
 
         # 点赞数
         if msg.method == "WebcastLikeMessage":
             data = unPackWebcastLikeMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            broadcast(data)
             continue
 
         # 成员进入直播间消息
         if msg.method == "WebcastMemberMessage":
             data = unPackWebcastMemberMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            broadcast(data)
             continue
 
         # 礼物消息
         if msg.method == "WebcastGiftMessage":
             data = unPackWebcastGiftMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            broadcast(data)
             continue
 
         # 聊天消息
         if msg.method == "WebcastChatMessage":
             data = unPackWebcastChatMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            try:
+                broadcast(data)
+            except Exception as e:
+                logger.error(e)
             continue
 
         # 联谊会消息
         if msg.method == "WebcastSocialMessage":
             data = unPackWebcastSocialMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            broadcast(data)
             continue
 
         # 房间用户发送消息
         if msg.method == "WebcastRoomUserSeqMessage":
             data = unPackWebcastRoomUserSeqMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            broadcast(data)
             continue
 
         # 更新粉丝票
         if msg.method == "WebcastUpdateFanTicketMessage":
             data = unPackWebcastUpdateFanTicketMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            broadcast(data)
             continue
 
         # 公共文本消息
         if msg.method == "WebcastCommonTextMessage":
             data = unPackWebcastCommonTextMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            broadcast(data)
             continue
 
         # 商品改变消息
         if msg.method == "WebcastProductChangeMessage":
             data = WebcastProductChangeMessage(msg.payload)
-            asyncio.run(broadcast(data))
+            broadcast(data)
             continue
         logger.info(
             "[onMessage] [待解析方法"
@@ -303,7 +315,7 @@ def sendAck(ws, logId, internalExt):
 
 
 def onError(ws, error):
-    logger.error("[onError] [webSocket Error事件] [房间Id：" + liveRoomId + "]")
+    logger.error(error)
 
 
 def onClose(ws, a, b):

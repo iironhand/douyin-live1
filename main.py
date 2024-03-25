@@ -1,21 +1,16 @@
-import _thread
-import asyncio
 import logging
 import sys
+import threading
 
-from local_server import start_server
 from src import dy_live
 from src.utils.common import init_global
 from src.utils.http_send import send_start
+from src.ws_server import start_server
 
-if __name__ == "__main__":
-    _thread.start_new_thread(asyncio.run, (start_server(),))
 
-    args = sys.argv
-
+def barrage(args):
     if not (len(args) >= 2 and args[1].startswith("https://live.douyin.com/")):
         raise Exception("参数错误")
-
     # 日志配置
     LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
     logging.basicConfig(level=logging.ERROR)
@@ -26,3 +21,11 @@ if __name__ == "__main__":
     send_start()
     # 在config.py配置中修改直播地址: LIVE_ROOM_URL
     dy_live.parseLiveRoomUrl(sys.argv[1])
+
+
+if __name__ == "__main__":
+    args = sys.argv
+
+    thread = threading.Thread(target=barrage, args=(args,))
+    thread.start()
+    start_server()
