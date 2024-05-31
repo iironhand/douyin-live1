@@ -47,11 +47,13 @@ def start_get_dy_user(room_url, _loop):
 
                     element.click()
                 except Exception as e:
-                    pass
+                    print(e)
+                    # driver.refresh()
+                    break
 
             for e in name_img_map:
                 print("\r", e, name_img_map[e], end='')
-            time.sleep(1)
+            time.sleep(10)
 
             data = {
                 "code": "1002",
