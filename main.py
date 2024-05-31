@@ -1,5 +1,6 @@
 # -- coding: utf-8 --**
 import logging
+import sys
 import threading
 
 import asyncio
@@ -29,11 +30,10 @@ def barrage(args, mloop):
 
 
 if __name__ == "__main__":
-    # program_args = sys.argv
-    # # thread = threading.Thread(target=barrage, args=(args, loop))
+    program_args = sys.argv
+    # program_args = (0, "https://live.douyin.com/529701251426")
 
     loop = asyncio.new_event_loop()
-    program_args = (0, "https://live.douyin.com/529701251426")
     threading.Thread(target=local_server.start_server, args=(loop,)).start()
     threading.Thread(target=start_get_dy_user, args=(program_args[1],loop)).start()
 
