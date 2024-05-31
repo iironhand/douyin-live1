@@ -14,6 +14,7 @@ from google.protobuf import json_format
 from protobuf_inspector.types import StandardParser
 
 from config import LIVE_GIFT_LIST
+from local_server import broadcast1
 from proto.dy_pb2 import (
     ChatMessage,
     CommonTextMessage,
@@ -28,10 +29,10 @@ from proto.dy_pb2 import (
     SocialMessage,
     UpdateFanTicketMessage,
 )
+from src import live_rank
 from src.utils.common import GlobalVal
 from src.utils.logger import logger
 from src.utils.ws_send import ws_sender
-from src.ws_server import broadcast
 
 # 直播信息全局变量
 liveRoomId = ""
@@ -60,32 +61,36 @@ def onMessage(ws: websocket.WebSocketApp, message: bytes):
         # 反对分数消息
         if msg.method == "WebcastMatchAgainstScoreMessage":
             data = unPackMatchAgainstScoreMessage(msg.payload)
-            broadcast(data)
+            # broadcast(data)
+            asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             continue
 
         # 点赞数
         if msg.method == "WebcastLikeMessage":
             data = unPackWebcastLikeMessage(msg.payload)
-            broadcast(data)
+            # broadcast(data)
+            asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             continue
 
         # 成员进入直播间消息
         if msg.method == "WebcastMemberMessage":
             data = unPackWebcastMemberMessage(msg.payload)
-            broadcast(data)
+            # broadcast(data)
+            asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             continue
 
         # 礼物消息
         if msg.method == "WebcastGiftMessage":
             data = unPackWebcastGiftMessage(msg.payload)
-            broadcast(data)
+            # broadcast(data)
+            asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             continue
 
         # 聊天消息
         if msg.method == "WebcastChatMessage":
             data = unPackWebcastChatMessage(msg.payload)
             try:
-                broadcast(data)
+                asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             except Exception as e:
                 logger.error(e)
             continue
@@ -93,31 +98,36 @@ def onMessage(ws: websocket.WebSocketApp, message: bytes):
         # 联谊会消息
         if msg.method == "WebcastSocialMessage":
             data = unPackWebcastSocialMessage(msg.payload)
-            broadcast(data)
+            # broadcast(data)
+            asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             continue
 
         # 房间用户发送消息
         if msg.method == "WebcastRoomUserSeqMessage":
             data = unPackWebcastRoomUserSeqMessage(msg.payload)
-            broadcast(data)
+            # broadcast(data)
+            asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             continue
 
         # 更新粉丝票
         if msg.method == "WebcastUpdateFanTicketMessage":
             data = unPackWebcastUpdateFanTicketMessage(msg.payload)
-            broadcast(data)
+            # broadcast(data)
+            asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             continue
 
         # 公共文本消息
         if msg.method == "WebcastCommonTextMessage":
             data = unPackWebcastCommonTextMessage(msg.payload)
-            broadcast(data)
+            # broadcast(data)
+            asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             continue
 
         # 商品改变消息
         if msg.method == "WebcastProductChangeMessage":
             data = WebcastProductChangeMessage(msg.payload)
-            broadcast(data)
+            # broadcast(data)
+            asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
             continue
         logger.info(
             "[onMessage] [待解析方法"
@@ -415,6 +425,7 @@ def parseLiveRoomUrl(url):
     print(f"主播账号信息: {live_room_info}")
     # 直播间id
     liveRoomId = res_room.group(1)
+    print(liveRoomId)
     # 获取m3u8直播流地址：m3u8直播比flv延迟2秒左右
     res_stream = re.search(r'hls_pull_url_map\\":(\{.*?})', res)
     res_stream_m3u8s = json.loads(res_stream.group(1).replace('\\"', '"'))
