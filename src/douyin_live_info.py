@@ -21,6 +21,7 @@ def start_get_dy_user(room_url, _loop):
     # 创建WebDriver实例
     driver = webdriver.Edge(options=edge_options)
     driver.implicitly_wait(5)
+    last_map = {}
     try:
         # 打开网页
         driver.get(room_url)
@@ -55,13 +56,16 @@ def start_get_dy_user(room_url, _loop):
                 print("\r", e, name_img_map[e], end='')
             time.sleep(10)
 
-            data = {
-                "code": "1002",
-                "data": name_img_map
-            }
-            data = json.dumps(data, ensure_ascii=False)
-            asyncio.run_coroutine_threadsafe(broadcast1(data),
-                                             loop=asyncio.get_event_loop())
+            if last_map != name_img_map:
+                data = {
+                    "code": "1002",
+                    "data": name_img_map
+                }
+                data = json.dumps(data, ensure_ascii=False)
+                asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
+                last_map = name_img_map
+
+
 
     finally:
         driver.quit()
