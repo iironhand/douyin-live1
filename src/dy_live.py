@@ -1,5 +1,4 @@
 import _thread
-import asyncio
 import binascii
 import gzip
 import json
@@ -8,6 +7,7 @@ import re
 import signal
 import time
 
+import asyncio
 import requests
 import websocket
 from google.protobuf import json_format
@@ -29,7 +29,6 @@ from proto.dy_pb2 import (
     SocialMessage,
     UpdateFanTicketMessage,
 )
-from src import live_rank
 from src.utils.common import GlobalVal
 from src.utils.logger import logger
 from src.utils.ws_send import ws_sender

@@ -30,8 +30,8 @@ def barrage(args, mloop):
 
 
 if __name__ == "__main__":
-    program_args = sys.argv
-    # program_args = (0, "https://live.douyin.com/989565634211")
+    # program_args = sys.argv
+    program_args = (0, "https://live.douyin.com/958353726333")
 
     loop = asyncio.new_event_loop()
     threading.Thread(target=local_server.start_server, args=(loop,)).start()

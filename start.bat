@@ -1,1 +1,1 @@
-pyinstaller -F .\main.py -n barrage
+pyinstaller -F .\main.py -n WssBarrageService

@@ -15,8 +15,16 @@ def start_get_dy_user(room_url, _loop):
     # 设置Edge的选项，这里可以根据需要调整，比如开启无头模式等
     edge_options = EdgeOptions()
     edge_options.add_argument("user-data-dir=c://path.txt")
+    # edge_options.add_argument('--enable-chrome-browser-cloud-management')
     # 指定EdgeDriver的路径，如果你已将其添加到PATH，这一步可以省略
-    # edge_options.binary_location = r'C:\Path\to\msedgedriver.exe1'
+    # edge_options.binary_location = r'.\msedgedriver.exe'
+    # 添加禁用GPU加速的参数
+    edge_options.add_argument('--disable-gpu')
+
+    # 如果你还需要禁用硬件加速的其他方面，可以加上以下参数
+    edge_options.add_argument('--disable-software-rasterizer')
+    edge_options.add_argument('--disable-webgl')
+    edge_options.add_argument('--no-sandbox')  # 这个参数也可以帮助在某些受限环境中运行
 
     # 创建WebDriver实例
     driver = webdriver.Edge(options=edge_options)
