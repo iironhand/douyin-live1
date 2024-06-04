@@ -14,7 +14,7 @@ def start_get_dy_user(room_url, _loop):
 
     # 设置Edge的选项，这里可以根据需要调整，比如开启无头模式等
     edge_options = EdgeOptions()
-    edge_options.add_argument("user-data-dir=c://path.txt")
+    edge_options.add_argument("user-data-dir=c://browser_data")
     # edge_options.add_argument('--enable-chrome-browser-cloud-management')
     # 指定EdgeDriver的路径，如果你已将其添加到PATH，这一步可以省略
     # edge_options.binary_location = r'.\msedgedriver.exe'
@@ -35,45 +35,50 @@ def start_get_dy_user(room_url, _loop):
         driver.get(room_url)
 
         while True:
-            elements = driver.find_elements(By.XPATH, "//span[@class='nvmSuSNN']")
-            if len(elements) == 1:
+            try:
+                driver.find_element(By.CLASS_NAME, "_KRdYhzy").click()
+                driver.find_element(By.XPATH, "//div[@class='uc-ui-icon-new_close_view']").click()
+            except Exception as e:
+                pass
+
+            video_boxes = driver.find_elements(By.XPATH, "//div[@class='W4iHfz0m b0KSDAZ9']")
+
+            if len(video_boxes) == 1:
                 print("\r", "等待连线..", end='')
-                time.sleep(1)
+                time.sleep(1.5)
                 continue
 
-            name_img_map = {}
-            for element in elements[1:]:
+            name_map = {}
+            for element in video_boxes:
                 try:
                     element.click()
-                    # 连线用户弹窗box
-                    img_element = driver.find_element(By.XPATH, "//div[@class='QFivDeia']//img[1]")
-                    name_element = driver.find_element(By.XPATH, "//div[@class='PS25Q1lw']")
+                    time.sleep(1)
+
+                    user_box = driver.find_element(By.XPATH, "//div[@class='QFivDeia']")
+                    img_element = user_box.find_element(By.XPATH, ".//img[@class='RlLOO79h']")
+                    name_element = driver.find_element(By.XPATH, ".//div[@class='PS25Q1lw']")
+
                     img_src = img_element.get_attribute("src")
                     img_src = img_src.replace('100x100', '1080x1080')
 
-                    name_img_map[name_element.text] = img_src
-                    time.sleep(1)
+                    name_map[name_element.text] = img_src
 
-                    element.click()
+                    video_boxes[0].click()
                 except Exception as e:
                     print(e)
-                    # driver.refresh()
+
                     break
 
-            for e in name_img_map:
-                print("\r", e, name_img_map[e], end='')
-            time.sleep(10)
+            time.sleep(5)
 
-            if last_map != name_img_map:
+            if len(name_map) != 0:
                 data = {
                     "code": "1002",
-                    "data": name_img_map
+                    "data": name_map
                 }
                 data = json.dumps(data, ensure_ascii=False)
                 asyncio.run_coroutine_threadsafe(broadcast1(data), loop=asyncio.get_event_loop())
-                last_map = name_img_map
-
-
+                last_map = name_map
 
     finally:
         driver.quit()
