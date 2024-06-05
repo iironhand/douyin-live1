@@ -20,11 +20,7 @@ def barrage(room_url, mloop):
 
 if __name__ == "__main__":
     args = sys.argv
-    for arg in args:
-        print(arg)
-    print("------------------")
 
-    print(len(args))
     room_url = args[1]
     open_avatar_thread = args[2]
 
