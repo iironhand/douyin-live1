@@ -23,6 +23,7 @@ def start_get_dy_user(room_url, _loop):
     edge_options.add_argument('--no-sandbox')  # 这个参数也可以帮助在某些受限环境中运行
     edge_options.add_experimental_option('excludeSwitches', ['enable-automation'])
     edge_options.add_argument('--disable-blink-features=AutomationControlled')
+    edge_options.add_argument('--enable-chrome-browser-cloud-management')
 
     # 创建WebDriver实例
     driver = webdriver.Edge(options=edge_options)
