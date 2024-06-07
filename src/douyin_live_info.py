@@ -17,6 +17,7 @@ def start_get_dy_user(room_url, _loop):
     edge_options = EdgeOptions()
     edge_options.add_argument("user-data-dir=c://browser_data")
     edge_options.add_argument('--disable-gpu')
+    # edge_options.add_argument('--headless')
     # 如果你还需要禁用硬件加速的其他方面，可以加上以下参数
     edge_options.add_argument('--disable-software-rasterizer')
     edge_options.add_argument('--disable-webgl')
