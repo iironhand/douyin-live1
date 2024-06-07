@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options as EdgeOptions
 
 from local_server import broadcast1
+from src.source import js
 
 
 def start_get_dy_user(room_url, _loop):
@@ -15,21 +16,22 @@ def start_get_dy_user(room_url, _loop):
     # 设置Edge的选项，这里可以根据需要调整，比如开启无头模式等
     edge_options = EdgeOptions()
     edge_options.add_argument("user-data-dir=c://browser_data")
-    # edge_options.add_argument('--enable-chrome-browser-cloud-management')
-    # 指定EdgeDriver的路径，如果你已将其添加到PATH，这一步可以省略
-    # edge_options.binary_location = r'.\msedgedriver.exe'
-    # 添加禁用GPU加速的参数
     edge_options.add_argument('--disable-gpu')
-
     # 如果你还需要禁用硬件加速的其他方面，可以加上以下参数
     edge_options.add_argument('--disable-software-rasterizer')
     edge_options.add_argument('--disable-webgl')
     edge_options.add_argument('--no-sandbox')  # 这个参数也可以帮助在某些受限环境中运行
+    edge_options.add_experimental_option('excludeSwitches', ['enable-automation'])
+    edge_options.add_argument('--disable-blink-features=AutomationControlled')
 
     # 创建WebDriver实例
     driver = webdriver.Edge(options=edge_options)
+
+    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+        "source": js
+    })
     driver.implicitly_wait(5)
-    last_map = {}
+
     try:
         # 打开网页
         driver.get(room_url)

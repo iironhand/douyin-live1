@@ -20,15 +20,14 @@ def barrage(room_url, mloop):
 
 if __name__ == "__main__":
     args = sys.argv
-
     room_url = args[1]
     open_avatar_thread = args[2]
+    # room_url = "https://live.douyin.com/927785877813"
+    # open_avatar_thread = "true"
 
-    if not args[1].startswith(r"https://live.douyin.com/"):
+    if not room_url.startswith(r"https://live.douyin.com/"):
         print("请输入正确的房间地址")
         exit(0)
-
-    # program_args = (0, "https://live.douyin.com/250844044426")
 
     loop = asyncio.new_event_loop()
     threading.Thread(target=local_server.start_server, args=(loop,)).start()
