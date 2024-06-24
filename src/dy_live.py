@@ -7,7 +7,6 @@ import os
 import random
 import re
 import signal
-import sys
 import time
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
@@ -368,18 +367,23 @@ def parseLiveRoomUrl(url):
         logger.info(f"房间标题: {liveRoomTitle}")
         if room_status == '4':
             print("直播已结束")
-            sys.exit(0)
+            # asyncio.run_coroutine_threadsafe(broadcast1("error:直播已结束"), loop=asyncio.get_event_loop())
+            return
+
+    live_room_info = None
+
     try:
         res_room = re.search(r'roomId\\":\\"(\d+)\\"', res)
         # 获取直播主播的uid和昵称等信息
         live_room_search = re.search(r'owner\\":(.*?),\\"room_auth', res)
         live_room_res = live_room_search.group(1).replace('\\"', '"')
+        live_room_info = json.loads(live_room_res)
     except Exception as e:
         logger.exception(e)
         print("直播间信息获取失败")
-        asyncio.run_coroutine_threadsafe(broadcast1("exit"), loop=asyncio.get_event_loop())
+        # asyncio.run_coroutine_threadsafe(broadcast1("error:直播间信息获取失败"), loop=asyncio.get_event_loop())
+        return
 
-    live_room_info = json.loads(live_room_res)
     logger.info(f"主播账号信息: {live_room_info}")
     print(f"主播账号信息: {live_room_info}")
     # 直播间id
