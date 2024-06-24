@@ -19,11 +19,11 @@ def barrage(room_url, mloop):
 
 
 if __name__ == "__main__":
-    args = sys.argv
-    room_url = args[1]
-    open_avatar_thread = args[2]
-    # room_url = "https://live.douyin.com/927785877813"
-    # open_avatar_thread = "true"
+    # args = sys.argv
+    # room_url = args[1]
+    # open_avatar_thread = args[2]
+    room_url = "https://live.douyin.com/1684653022841"
+    open_avatar_thread = "false"
 
     if not room_url.startswith(r"https://live.douyin.com/"):
         print("请输入正确的房间地址")

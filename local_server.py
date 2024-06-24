@@ -29,6 +29,8 @@ def start_server(_loop):
 
 # 广播
 async def broadcast1(message):
+    if message == "exit":
+        exit(0)
     if len(conns) == 0:
         return
     for conn in conns:

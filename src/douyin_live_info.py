@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options as EdgeOptions
 
 from local_server import broadcast1
-from src.source import js
+from src.source import js1
 
 
 def start_get_dy_user(room_url, _loop):
@@ -30,7 +30,7 @@ def start_get_dy_user(room_url, _loop):
     driver = webdriver.Edge(options=edge_options)
 
     driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-        "source": js
+        "source": js1
     })
     driver.implicitly_wait(5)
 

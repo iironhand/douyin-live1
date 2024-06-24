@@ -45,13 +45,14 @@ def handle_rank(roo_id, delay):
     while True:
         try:
             get_rank(roo_id)
-        except Exception as e:
-            print(f"推送打赏排名出错:{e}")
+        except Exception:
+            # print(f"推送打赏排名出错:{e}")
+            pass
         time.sleep(delay)
 
 
 def interval_rank(roo_id):
-    print(f"间隔{LIVE_RANK_INTERVAL}秒更新一下排行")
+    # print(f"间隔{LIVE_RANK_INTERVAL}秒更新一下排行")
     if LIVE_RANK_LIST:
         rank_t = threading.Thread(target=handle_rank, args=(roo_id, LIVE_RANK_INTERVAL))
         rank_t.start()
