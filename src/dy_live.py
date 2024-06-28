@@ -7,6 +7,7 @@ import os
 import random
 import re
 import signal
+import sys
 import time
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
@@ -32,7 +33,7 @@ from proto.dy_pb2 import RoomUserSeqMessage
 from proto.dy_pb2 import SocialMessage
 from proto.dy_pb2 import UpdateFanTicketMessage
 from src.source import js2
-from src.utils.common import GlobalVal
+from src.utils.common import GlobalVal, kill_process
 from src.utils.logger import logger
 from src.utils.ws_send import ws_sender
 
@@ -367,7 +368,7 @@ def parseLiveRoomUrl(url):
         logger.info(f"房间标题: {liveRoomTitle}")
         if room_status == '4':
             print("直播已结束")
-            # asyncio.run_coroutine_threadsafe(broadcast1("error:直播已结束"), loop=asyncio.get_event_loop())
+            kill_process()
             return
 
     live_room_info = None
@@ -381,7 +382,7 @@ def parseLiveRoomUrl(url):
     except Exception as e:
         logger.exception(e)
         print("直播间信息获取失败")
-        # asyncio.run_coroutine_threadsafe(broadcast1("error:直播间信息获取失败"), loop=asyncio.get_event_loop())
+        kill_process()
         return
 
     logger.info(f"主播账号信息: {live_room_info}")

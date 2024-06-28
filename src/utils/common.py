@@ -1,6 +1,16 @@
-import requests
 import json
+import os
+import signal
+
+import requests
+
 from config import LIVE_WEB_SEND_URL, GAME_UUID, DONATION_UUID
+
+
+def kill_process():
+    current_pid = os.getpid()
+    # 使用os.kill发送SIGTERM信号到当前进程
+    os.kill(current_pid, signal.SIGTERM)
 
 
 class GlobalVal(object):

@@ -20,8 +20,7 @@ def barrage(room_url, mloop):
 if __name__ == "__main__":
     args = sys.argv
     room_url = args[1]
-    # open_avatar_thread = args[2]
-    # room_url = "https://live.douyin.com/1684653022841"
+    # room_url = "https://live.douyin.com/2403837216141"
     # open_avatar_thread = "false"
 
     if not room_url.startswith(r"https://live.douyin.com/"):
